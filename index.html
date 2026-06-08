@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orbit — stay in motion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont/tabler-icons.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Syne', sans-serif;
+      background: #0D0D0F;
+      color: #F0EFF8;
+      display: flex;
+      line-height: 1.5;
+      overflow: hidden;
+    }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+    input, select, button, textarea { font-family: 'Syne', sans-serif; outline: none; }
+    a { text-decoration: none; color: inherit; }
+
+    .sidebar {
+      width: 200px;
+      min-width: 200px;
+      background: #111114;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid rgba(255,255,255,0.07);
+      padding: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      z-index: 10;
+    }
+    .sidebar .brand {
+      padding: 24px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .sidebar .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sidebar .brand-row i { font-size: 22px; color: #7F77DD; }
+    .sidebar .brand-name {
+      font-weight: 700;
+      font-size: 18px;
+      color: #F0EFF8;
+      letter-spacing: 0.5px;
+    }
+    .sidebar .tagline {
+      font-size: 11px;
+      color: #5C5A72;
+      font-weight: 400;
+      letter-spacing: 0.3px;
+      margin-left: 30px;
+      margin-top: -2px;
+    }
+    .nav-section {
+      padding: 16px 0 8px;
+    }
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #5C5A72;
+      letter-spacing: 1.2px;
+      padding: 0 20px 8px;
+      text-transform: uppercase;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      font-size: 13px;
+      font-weight: 400;
+      color: #9896B0;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+      border-left: 2px solid transparent;
+      user-select: none;
+    }
+    .nav-item:hover {
+      background: rgba(255,255,255,0.03);
+      color: #F0EFF8;
+    }
+    .nav-item.active {
+      background: #2A2740;
+      color: #F0EFF8;
+      border-left-color: #7F77DD;
+    }
+    .nav-item i {
+      font-size: 16px;
+      line-height: 1;
+    }
+    .nav-item .nav-label {
+      flex: 1;
+    }
+    .nav-item .badge {
+      font-size: 10px;
+      font-weight: 500;
+      background: rgba(255,255,255,0.07);
+      color: #9896B0;
+      padding: 1px 7px;
+      border-radius: 10px;
+      min-width: 20px;
+      text-align: center;
+      line-height: 18px;
+    }
+    .nav-item .badge.overdue-badge {
+      background: rgba(226,75,74,0.2);
+      color: #E24B4A;
+    }
+    .nav-spacer { flex: 1; }
+    .sidebar .bottom-items {
+      padding: 8px 0 16px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      min-width: 0;
+    }
+    .main-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 28px 28px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      background: #0D0D0F;
+    }
+    .search-wrapper {
+      flex: 1;
+      position: relative;
+      max-width: 360px;
+    }
+    .search-wrapper i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      color: #5C5A72;
+      pointer-events: none;
+    }
+    .search-wrapper input {
+      width: 100%;
+      padding: 8px 12px 8px 34px;
+      background: #141417;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px;
+      color: #F0EFF8;
+      font-size: 13px;
+      font-weight: 400;
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .search-wrapper input::placeholder { color: #5C5A72; }
+    .search-wrapper input:focus {
+      border-color: #7F77DD;
+      box-shadow: 0 0 0 3px rgba(127,119,221,0.12);
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .bell-wrapper {
+      position: relative;
+    }
+    .bell-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: transparent;
+      color: #9896B0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .bell-btn:hover {
+      background: rgba(255,255,255,0.05);
+      color: #F0EFF8;
+    }
+    .bell-btn.alert {
+      background: rgba(226,75,74,0.1);
+      border-color: #E24B4A;
+      color: #E24B4A;
+    }
+    .bell-btn.alert i {
+      animation: ring 0.6s ease-in-out infinite;
+      transform-origin: top center;
+    }
+    @keyframes ring {
+      0%, 100% { transform: rotate(0deg); }
+      20% { transform: rotate(12deg); }
+      40% { transform: rotate(-10deg); }
+      60% { transform: rotate(6deg); }
+      80% { transform: rotate(-4deg); }
+    }
+    .bell-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      min-width: 16px;
+      height: 16px;
+      background: #E24B4A;
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 0 4px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      animation: badgePop 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .bell-badge.show { display: flex; }
+    @keyframes badgePop {
+      0% { transform: scale(0); }
+      100% { transform: scale(1); }
+    }
+
+    .bell-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 320px;
+      background: #18181C;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      display: none;
+      z-index: 100;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    .bell-dropdown.open { display: block; }
+    .bell-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .bell-header span {
+      font-size: 13px;
+      font-weight: 500;
+      color: #F0EFF8;
+    }
+    .mark-all-btn {
+      background: none;
+      border: none;
+      color: #AFA9EC;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Syne', sans-serif;
+      padding: 2px 8px;
+      border-radius: 4px;
+      transition: background 0.15s;
+    }
+    .mark-all-btn:hover { background: rgba(127,119,221,0.1); }
+    .bell-list {
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .bell-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.15s;
+    }
+    .bell-item:hover { background: rgba(255,255,255,0.02); }
+    .bell-item-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(226,75,74,0.15);
+      color: #E24B4A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .bell-item-icon i { font-size: 14px; }
+    .bell-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .bell-item-name {
+      font-size: 12px;
+      font-weight: 400;
+      color: #F0EFF8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .bell-item-time {
+      font-size: 10px;
+      color: #5C5A72;
+      font-weight: 400;
+    }
+    .bell-empty {
+      padding: 28px 16px;
+      text-align: center;
+      color: #9896B0;
+    }
+    .bell-empty i {
+      font-size: 28px;
+      color: #1D9E75;
+      margin-bottom: 8px;
+    }
+    .bell-empty p {
+      font-size: 12px;
+      font-weight: 400;
+    }
+    .bell-footer {
+      padding: 10px 16px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      text-align: center;
+    }
+    .bell-footer a {
+      font-size: 11px;
+      font-weight: 500;
+      color: #AFA9EC;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .bell-footer a:hover { color: #7F77DD; }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #2A2740;
+      color: #AFA9EC;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+      letter-spacing: 0.5px;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      padding: 20px 0 16px;
+    }
+    .stat-card {
+      background: #18181C;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .stat-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: #9896B0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #F0EFF8;
+      transition: transform 0.2s;
+      line-height: 1;
+    }
+    .stat-value.pulse {
+      animation: statPulse 0.35s ease-out;
+    }
+    @keyframes statPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+      100% { transform: scale(1); }
+    }
+    .stat-value.accent { color: #7F77DD; }
+    .stat-value.teal { color: #1D9E75; }
+    .stat-value.ember { color: #E24B4A; }
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #1D9E75;
+      border-radius: 4px;
+      transition: width 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      width: 0%;
+    }
+
+    .task-panel {
+      background: #18181C;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      padding: 18px 20px 20px;
+    }
+    .panel-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #F0EFF8;
+      margin-bottom: 14px;
+    }
+    .task-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .form-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .form-row .flex-1 { flex: 1; }
+    .task-form input[type="text"],
+    .task-form input[type="date"],
+    .task-form input[type="time"],
+    .task-form select {
+      padding: 8px 12px;
+      background: #141417;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px;
+      color: #F0EFF8;
+      font-size: 13px;
+      font-weight: 400;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .task-form input::placeholder { color: #5C5A72; }
+    .task-form input:focus,
+    .task-form select:focus {
+      border-color: #7F77DD;
+      box-shadow: 0 0 0 3px rgba(127,119,221,0.12);
+    }
+    .task-form select {
+      appearance: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='%235C5A72'%3E%3Cpath d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 28px;
+    }
+    .task-form select option { background: #141417; color: #F0EFF8; }
+    .btn-primary {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      background: #7F77DD;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .btn-primary:hover { background: #6F67CD; }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-primary i { font-size: 15px; }
+    .form-error {
+      font-size: 11px;
+      font-weight: 400;
+      color: #E24B4A;
+      min-height: 16px;
+      margin-top: -2px;
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 8px;
+      padding: 16px 0 14px;
+    }
+    .pill {
+      padding: 6px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: transparent;
+      color: #9896B0;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'Syne', sans-serif;
+    }
+    .pill:hover {
+      border-color: rgba(255,255,255,0.13);
+      color: #F0EFF8;
+    }
+    .pill.active {
+      background: #7F77DD;
+      border-color: #7F77DD;
+      color: #fff;
+    }
+
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .task-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      background: #18181C;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      transition: background 0.3s, border-color 0.3s, opacity 0.3s, transform 0.3s;
+      position: relative;
+    }
+    .task-card.adding {
+      animation: taskSlideIn 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    @keyframes taskSlideIn {
+      0% { transform: translateY(-8px) scale(0.98); opacity: 0; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .task-card.removing {
+      animation: taskSlideOut 0.25s ease-in forwards;
+    }
+    @keyframes taskSlideOut {
+      0% { transform: translateX(0); opacity: 1; }
+      100% { transform: translateX(30px); opacity: 0; }
+    }
+    .task-card.done {
+      background: #0D1F1A;
+      border-color: rgba(29,158,117,0.3);
+    }
+    .task-card.overdue {
+      background: #1F1214;
+      border-color: #5A2020;
+    }
+    .task-check {
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 1px;
+      background: transparent;
+    }
+    .task-check:hover {
+      border-color: #7F77DD;
+    }
+    .task-check.done {
+      background: #1D9E75;
+      border-color: #1D9E75;
+    }
+    .task-check.done i {
+      color: #fff;
+      font-size: 11px;
+      display: block;
+    }
+    .task-check i { display: none; }
+    .task-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .task-text {
+      font-size: 13px;
+      font-weight: 400;
+      color: #F0EFF8;
+      line-height: 1.4;
+      word-break: break-word;
+      transition: color 0.3s;
+    }
+    .task-card.done .task-text {
+      text-decoration: line-through;
+      color: #9896B0;
+    }
+    .task-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+    .task-meta-item {
+      font-size: 10px;
+      font-weight: 400;
+      color: #5C5A72;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .task-meta-item i { font-size: 11px; }
+    .priority-tag {
+      font-size: 9px;
+      font-weight: 500;
+      padding: 1px 7px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .priority-tag.high {
+      background: rgba(226,75,74,0.15);
+      color: #E24B4A;
+    }
+    .priority-tag.medium {
+      background: rgba(212,160,74,0.15);
+      color: #D4A04A;
+    }
+    .priority-tag.low {
+      background: rgba(29,158,117,0.15);
+      color: #1D9E75;
+    }
+    .overdue-tag {
+      font-size: 9px;
+      font-weight: 500;
+      padding: 1px 7px;
+      border-radius: 4px;
+      background: rgba(226,75,74,0.15);
+      color: #E24B4A;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .task-delete {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #5C5A72;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      flex-shrink: 0;
+      margin-top: -2px;
+    }
+    .task-delete:hover {
+      background: rgba(226,75,74,0.12);
+      border-color: #E24B4A;
+      color: #E24B4A;
+    }
+    .task-delete i { font-size: 15px; }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 20px;
+      text-align: center;
+    }
+    .empty-state i {
+      font-size: 40px;
+      color: #5C5A72;
+      margin-bottom: 12px;
+    }
+    .empty-state p {
+      font-size: 14px;
+      font-weight: 400;
+      color: #9896B0;
+    }
+
+    @media (max-width: 820px) {
+      .sidebar { display: none; }
+      .main-scroll { padding: 0 16px 16px; }
+      .topbar { padding: 12px 16px; }
+      .stats-row { grid-template-columns: 1fr; }
+      .form-row { flex-wrap: wrap; }
+      .bell-dropdown { width: 290px; right: -50px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-row">
+        <i class="ti ti-planet" aria-hidden="true"></i>
+        <span class="brand-name">Orbit</span>
+      </div>
+      <span class="tagline">stay in motion</span>
+    </div>
+
+    <div class="nav-section">
+      <div class="section-label">WORKSPACE</div>
+      <a class="nav-item active" data-view="all">
+        <i class="ti ti-layout-dashboard" aria-hidden="true"></i>
+        <span class="nav-label">Dashboard</span>
+        <span class="badge" id="badgeAll">0</span>
+      </a>
+      <a class="nav-item" data-view="active">
+        <i class="ti ti-circle-dashed" aria-hidden="true"></i>
+        <span class="nav-label">Active</span>
+        <span class="badge" id="badgeActive">0</span>
+      </a>
+      <a class="nav-item" data-view="done">
+        <i class="ti ti-circle-check" aria-hidden="true"></i>
+        <span class="nav-label">Completed</span>
+        <span class="badge" id="badgeDone">0</span>
+      </a>
+      <a class="nav-item" data-view="overdue">
+        <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+        <span class="nav-label">Overdue</span>
+        <span class="badge overdue-badge" id="badgeOverdue">0</span>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="section-label">PRIORITY</div>
+      <a class="nav-item prio-item" data-prio="high">
+        <i class="ti ti-flame" aria-hidden="true"></i>
+        <span class="nav-label">High</span>
+      </a>
+      <a class="nav-item prio-item" data-prio="medium">
+        <i class="ti ti-minus" aria-hidden="true"></i>
+        <span class="nav-label">Medium</span>
+      </a>
+      <a class="nav-item prio-item" data-prio="low">
+        <i class="ti ti-leaf" aria-hidden="true"></i>
+        <span class="nav-label">Low</span>
+      </a>
+    </div>
+
+    <div class="nav-spacer"></div>
+
+    <div class="bottom-items">
+      <a class="nav-item">
+        <i class="ti ti-settings" aria-hidden="true"></i>
+        <span class="nav-label">Settings</span>
+      </a>
+      <a class="nav-item">
+        <i class="ti ti-help" aria-hidden="true"></i>
+        <span class="nav-label">Help</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="search-wrapper">
+        <i class="ti ti-search" aria-hidden="true"></i>
+        <input type="text" id="searchInput" placeholder="Search tasks..." autocomplete="off">
+      </div>
+      <div class="topbar-right">
+        <div class="bell-wrapper" id="bellWrapper">
+          <button class="bell-btn" id="bellBtn" aria-label="Notifications">
+            <i class="ti ti-bell" aria-hidden="true"></i>
+            <span class="bell-badge" id="bellBadge">0</span>
+          </button>
+          <div class="bell-dropdown" id="bellDropdown">
+            <div class="bell-header">
+              <span>Overdue alerts</span>
+              <button class="mark-all-btn" id="markAllBtn">Mark all done</button>
+            </div>
+            <div class="bell-list" id="bellList"></div>
+            <div class="bell-footer">
+              <a id="viewOverdueLink">View all overdue tasks</a>
+            </div>
+          </div>
+        </div>
+        <div class="avatar">OR</div>
+      </div>
+    </header>
+
+    <div class="main-scroll">
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="stat-label">Total Tasks</span>
+          <span class="stat-value accent" id="statTotal">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Completed</span>
+          <span class="stat-value teal" id="statDone">0</span>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Overdue</span>
+          <span class="stat-value ember" id="statOverdue">0</span>
+        </div>
+      </div>
+
+      <div class="task-panel">
+        <h2 class="panel-title">+ New task</h2>
+        <div class="task-form">
+          <div class="form-row">
+            <input type="text" id="taskInput" placeholder="What needs to be done?" class="flex-1" autocomplete="off">
+            <button class="btn-primary" id="addBtn">
+              <i class="ti ti-plus" aria-hidden="true"></i>
+              Add Task
+            </button>
+          </div>
+          <div class="form-row">
+            <input type="date" id="dateInput" class="flex-1">
+            <input type="time" id="timeInput" style="width:100px">
+            <select id="prioritySelect" style="width:110px">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          <div class="form-error" id="formError"></div>
+        </div>
+      </div>
+
+      <div class="filter-pills" id="filterPills">
+        <button class="pill active" data-filter="all">All</button>
+        <button class="pill" data-filter="active">Active</button>
+        <button class="pill" data-filter="done">Done</button>
+        <button class="pill" data-filter="overdue">Overdue</button>
+      </div>
+
+      <div class="task-list" id="taskList"></div>
+    </div>
+  </div>
+
+  <script>
+    let tasks = [];
+    let nextId = 1;
+    let currentFilter = 'all';
+    let priorityFilter = null;
+    let searchQuery = '';
+    let isBellOpen = false;
+
+    const $ = id => document.getElementById(id);
+    const taskInput = $('taskInput');
+    const dateInput = $('dateInput');
+    const timeInput = $('timeInput');
+    const prioritySelect = $('prioritySelect');
+    const addBtn = $('addBtn');
+    const formError = $('formError');
+    const searchInput = $('searchInput');
+    const taskList = $('taskList');
+    const filterPills = $('filterPills');
+    const bellBtn = $('bellBtn');
+    const bellBadge = $('bellBadge');
+    const bellDropdown = $('bellDropdown');
+    const bellList = $('bellList');
+    const markAllBtn = $('markAllBtn');
+    const viewOverdueLink = $('viewOverdueLink');
+    const statTotal = $('statTotal');
+    const statDone = $('statDone');
+    const statOverdue = $('statOverdue');
+    const progressFill = $('progressFill');
+    const badgeAll = $('badgeAll');
+    const badgeActive = $('badgeActive');
+    const badgeDone = $('badgeDone');
+    const badgeOverdue = $('badgeOverdue');
+
+    function todayStr() {
+      const d = new Date();
+      return d.getFullYear() + '-' +
+        String(d.getMonth() + 1).padStart(2, '0') + '-' +
+        String(d.getDate()).padStart(2, '0');
+    }
+    function nowStr() {
+      const d = new Date();
+      return String(d.getHours()).padStart(2, '0') + ':' +
+        String(d.getMinutes()).padStart(2, '0');
+    }
+
+    function parseDatetime(dateStr, timeStr) {
+      return new Date(dateStr + 'T' + (timeStr || '23:59'));
+    }
+
+    function isOverdue(task) {
+      if (task.done) return false;
+      return parseDatetime(task.date, task.time) < new Date();
+    }
+
+    function relativeTime(date) {
+      const diff = new Date() - date;
+      const mins = Math.floor(diff / 60000);
+      const hrs = Math.floor(diff / 3600000);
+      const days = Math.floor(diff / 86400000);
+      if (mins < 1) return 'Just now';
+      if (mins < 60) return mins + 'm ago';
+      if (hrs < 24) return hrs + 'h ago';
+      return days + 'd ago';
+    }
+
+    function formatDate(dateStr) {
+      const d = new Date(dateStr + 'T00:00:00');
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function getStats() {
+      const total = tasks.length;
+      const done = tasks.filter(t => t.done).length;
+      const overdue = tasks.filter(t => isOverdue(t)).length;
+      const active = total - done;
+      const pct = total > 0 ? (done / total) * 100 : 0;
+      return { total, active, done, overdue, pct };
+    }
+
+    function filteredTasks() {
+      let result = [...tasks];
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        result = result.filter(t => t.text.toLowerCase().includes(q));
+      }
+      if (priorityFilter) {
+        result = result.filter(t => t.pri === priorityFilter);
+      }
+      if (currentFilter === 'active') {
+        result = result.filter(t => !t.done);
+      } else if (currentFilter === 'done') {
+        result = result.filter(t => t.done);
+      } else if (currentFilter === 'overdue') {
+        result = result.filter(t => isOverdue(t));
+      }
+      return result;
+    }
+
+    function render() {
+      renderSidebar();
+      renderStats();
+      renderTasks();
+      renderBell();
+    }
+
+    function pulseStat(el) {
+      if (!el) return;
+      el.classList.remove('pulse');
+      void el.offsetWidth;
+      el.classList.add('pulse');
+    }
+
+    function renderSidebar() {
+      const stats = getStats();
+      badgeAll.textContent = stats.total;
+      badgeActive.textContent = stats.active;
+      badgeDone.textContent = stats.done;
+      badgeOverdue.textContent = stats.overdue;
+
+      document.querySelectorAll('.nav-item[data-view]').forEach(el => {
+        const v = el.dataset.view;
+        el.classList.toggle('active', v === currentFilter);
+      });
+
+      document.querySelectorAll('.nav-item.prio-item').forEach(el => {
+        const p = el.dataset.prio;
+        el.classList.toggle('active', p === priorityFilter);
+      });
+    }
+
+    function renderStats() {
+      const stats = getStats();
+      const oldTotal = statTotal.textContent;
+      const oldDone = statDone.textContent;
+      const oldOverdue = statOverdue.textContent;
+
+      statTotal.textContent = stats.total;
+      statDone.textContent = stats.done;
+      statOverdue.textContent = stats.overdue;
+      progressFill.style.width = stats.pct + '%';
+
+      if (oldTotal !== String(stats.total)) pulseStat(statTotal);
+      if (oldDone !== String(stats.done)) pulseStat(statDone);
+      if (oldOverdue !== String(stats.overdue)) pulseStat(statOverdue);
+    }
+
+    function renderTasks() {
+      const items = filteredTasks();
+      if (items.length === 0) {
+        taskList.innerHTML =
+          '<div class="empty-state">' +
+            '<i class="ti ti-planet" aria-hidden="true"></i>' +
+            '<p>No tasks orbiting yet</p>' +
+          '</div>';
+        return;
+      }
+      let html = '';
+      for (const t of items) {
+        const od = isOverdue(t);
+        const cls = 'task-card' +
+          (t.done ? ' done' : '') +
+          (od ? ' overdue' : '');
+        const checkCls = 'task-check' + (t.done ? ' done' : '');
+        const dateStr = formatDate(t.date) + (t.time ? ' ' + t.time : '');
+        const prioLabel = t.pri.charAt(0).toUpperCase() + t.pri.slice(1);
+        html +=
+          '<div class="' + cls + '" data-id="' + t.id + '">' +
+            '<div class="' + checkCls + '" data-action="toggle" data-id="' + t.id + '">' +
+              '<i class="ti ti-check" aria-hidden="true"></i>' +
+            '</div>' +
+            '<div class="task-body">' +
+              '<div class="task-text">' + escapeHtml(t.text) + '</div>' +
+              '<div class="task-meta">' +
+                '<span class="task-meta-item"><i class="ti ti-calendar" aria-hidden="true"></i>' + dateStr + '</span>' +
+                (od ? '<span class="overdue-tag"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Overdue</span>' : '') +
+                '<span class="priority-tag ' + t.pri + '">' + prioLabel + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<button class="task-delete" data-action="delete" data-id="' + t.id + '" aria-label="Delete task">' +
+              '<i class="ti ti-trash" aria-hidden="true"></i>' +
+            '</button>' +
+          '</div>';
+      }
+      taskList.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    function renderBell() {
+      const overdueTasks = tasks.filter(t => isOverdue(t));
+      const count = overdueTasks.length;
+
+      if (count > 0) {
+        bellBtn.classList.add('alert');
+        bellBadge.textContent = count > 9 ? '9+' : count;
+        bellBadge.classList.add('show');
+      } else {
+        bellBtn.classList.remove('alert');
+        bellBadge.classList.remove('show');
+      }
+
+      if (overdueTasks.length === 0) {
+        bellList.innerHTML =
+          '<div class="bell-empty">' +
+            '<i class="ti ti-checks" aria-hidden="true"></i>' +
+            '<p>All caught up — no overdue tasks</p>' +
+          '</div>';
+        return;
+      }
+
+      let html = '';
+      for (const t of overdueTasks) {
+        const dt = parseDatetime(t.date, t.time);
+        html +=
+          '<div class="bell-item">' +
+            '<div class="bell-item-icon"><i class="ti ti-clock" aria-hidden="true"></i></div>' +
+            '<div class="bell-item-info">' +
+              '<div class="bell-item-name">' + escapeHtml(t.text) + '</div>' +
+              '<div class="bell-item-time">' + relativeTime(dt) + '</div>' +
+            '</div>' +
+          '</div>';
+      }
+      bellList.innerHTML = html;
+    }
+
+    function addTask() {
+      const text = taskInput.value.trim();
+      if (!text) {
+        formError.textContent = 'Task name cannot be empty';
+        taskInput.focus();
+        return;
+      }
+      formError.textContent = '';
+      const task = {
+        id: nextId++,
+        text: text,
+        done: false,
+        date: dateInput.value || todayStr(),
+        time: timeInput.value || '',
+        pri: prioritySelect.value
+      };
+      const newId = task.id;
+      tasks.push(task);
+      taskInput.value = '';
+      taskInput.focus();
+      dateInput.value = todayStr();
+      timeInput.value = nowStr();
+      prioritySelect.value = 'medium';
+
+      render();
+      const newCard = taskList.querySelector('.task-card[data-id="' + newId + '"]');
+      if (newCard) {
+        newCard.classList.add('adding');
+      }
+    }
+
+    function deleteTask(id) {
+      const card = taskList.querySelector('.task-card[data-id="' + id + '"]');
+      if (card) {
+        card.classList.add('removing');
+        setTimeout(() => {
+          tasks = tasks.filter(t => t.id !== id);
+          render();
+        }, 240);
+      } else {
+        tasks = tasks.filter(t => t.id !== id);
+        render();
+      }
+    }
+
+    function toggleTask(id) {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+      task.done = !task.done;
+      render();
+    }
+
+    function markAllOverdueDone() {
+      tasks.forEach(t => {
+        if (isOverdue(t)) t.done = true;
+      });
+      closeBell();
+      render();
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.pill').forEach(el => {
+        el.classList.toggle('active', el.dataset.filter === filter);
+      });
+      render();
+    }
+
+    function togglePriority(p) {
+      if (priorityFilter === p) {
+        priorityFilter = null;
+      } else {
+        priorityFilter = p;
+      }
+      render();
+    }
+
+    function openBell() {
+      isBellOpen = true;
+      bellDropdown.classList.add('open');
+      renderBell();
+    }
+
+    function closeBell() {
+      isBellOpen = false;
+      bellDropdown.classList.remove('open');
+    }
+
+    function toggleBell() {
+      if (isBellOpen) closeBell();
+      else openBell();
+    }
+
+    addBtn.addEventListener('click', addTask);
+    taskInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') addTask();
+    });
+
+    searchInput.addEventListener('input', () => {
+      searchQuery = searchInput.value.trim();
+      render();
+    });
+
+    filterPills.addEventListener('click', e => {
+      const pill = e.target.closest('.pill');
+      if (!pill) return;
+      const f = pill.dataset.filter;
+      if (f) setFilter(f);
+    });
+
+    document.querySelectorAll('.nav-item[data-view]').forEach(el => {
+      el.addEventListener('click', () => {
+        const view = el.dataset.view;
+        setFilter(view);
+      });
+    });
+
+    document.querySelectorAll('.nav-item.prio-item').forEach(el => {
+      el.addEventListener('click', () => {
+        togglePriority(el.dataset.prio);
+      });
+    });
+
+    taskList.addEventListener('click', e => {
+      const target = e.target.closest('[data-action]');
+      if (!target) return;
+      const id = Number(target.dataset.id);
+      const action = target.dataset.action;
+      if (action === 'toggle') toggleTask(id);
+      else if (action === 'delete') deleteTask(id);
+    });
+
+    bellBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      toggleBell();
+    });
+
+    document.addEventListener('click', e => {
+      if (isBellOpen && !bellWrapper.contains(e.target)) {
+        closeBell();
+      }
+    });
+
+    markAllBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      markAllOverdueDone();
+    });
+
+    viewOverdueLink.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      closeBell();
+      setFilter('overdue');
+    });
+
+    const bellWrapper = $('bellWrapper');
+
+    dateInput.value = todayStr();
+    timeInput.value = nowStr();
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yStr = yesterday.getFullYear() + '-' +
+      String(yesterday.getMonth() + 1).padStart(2, '0') + '-' +
+      String(yesterday.getDate()).padStart(2, '0');
+
+    tasks = [
+      { id: nextId++, text: 'Review Q2 project roadmap', done: false, date: yStr, time: '14:00', pri: 'high' },
+      { id: nextId++, text: 'Update team on sprint progress', done: true, date: yStr, time: '10:00', pri: 'medium' },
+      { id: nextId++, text: 'Prepare design system documentation', done: false, date: todayStr(), time: '', pri: 'low' },
+    ];
+
+    render();
+  </script>
+</body>
+</html>
